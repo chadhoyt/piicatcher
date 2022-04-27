@@ -1,18 +1,16 @@
 # Local Setup Steps
 
-## PII Catcher Setup
+## PII Catcher Setup (Docker version)
 
-Reference: <https://tokern.io/docs/piicatcher/installation>
+References: <https://github.com/tokern/piicatcher> & <https://tokern.io/docs/piicatcher/installation>
 
     git clone https://github.com/tokern/piicatcher.git
     cd piicatcher
-    poetry install
+    alias piicatcher='docker run -v ${HOME}/.config/tokern:/config -u $(id -u ${USER}):$(id -g ${USER}) -it --add-host=host.docker.internal:host-gateway tokern/piicatcher:latest'
 
-## Poetry Pyenv Config
+## Scan Usage Examples
 
-Reference: <https://blog.jayway.com/2019/12/28/pyenv-poetry-saviours-in-the-python-chaos/>
+Run these against nonprod sources that are current, like EDW-Stage and sunup-prod-performance.  Use "piicatcher --help" for instruction (docs and repo readme seem either newer or outdated for docker image).
 
-If error about python version then configure poetry project to use pyenv with following, then re-run "poetry install":
-
-    zsh pyenv local 3.8.13 
-    poetry config virtualenvs.in-project true
+piicatcher db --connection-type postgres --user $PIICATCHER_DB_USER=chad --password $PIICATCHER_DB_PWD --host $PIICATCHER_EDW_HOST --port 5432 --database enterprise_dw --scan-type shallow --exclude-schema public > edw-pii-results-shallow.txt
+piicatcher db --connection-type postgres --user $PIICATCHER_DB_USER=chad --password $PIICATCHER_DB_PWD --host $PIICATCHER_BSF_HOST --port 5432 --database bsf --scan-type shallow --exclude-schema public > bsf-pii-results-shallow.txt
